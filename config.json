@@ -1,0 +1,12 @@
+{
+    "client_id": "<YOUR CLIENT ID>",
+    "client_secret": "<YOUR CLIENT SECRET>",
+
+    "repeat": "context",
+    "shuffle": true,
+
+    "select_active_device": true,
+    "skip_back_limit": 5000,
+    "device_not_found_limit": false,
+    "useless_refresh": false
+}
