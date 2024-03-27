@@ -10,8 +10,10 @@ if limit is not False:
     limit -= 1
 if "macos" in platform.platform().lower():
     import tkmacosx as tk_
+    mac = True
 else:
     tk_ = tk
+    mac = False
 
 headers = {"Authorization": f"{get_token.token['token_type']} {get_token.token['access_token']}"}
 lock = threading.Lock()
@@ -141,8 +143,10 @@ def update_buttons():
     scale2.configure(to=state["item"]["duration_ms"]/1000)
     vol.set(state["device"]["volume_percent"])
     pos.set(floor(state["progress_ms"]/1000))
-    button1 = tk_.Button(window, command=toggle_playback, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black", focuscolor="black", borderless=1)
+    button1 = tk_.Button(window, command=toggle_playback, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     button1.configure(text="Pause" if state["is_playing"] else "Play", anchor="center")
+    if mac:
+        button1.configure(focuscolor="black", borderless=1)
     button1.grid(row=0, column=1, rowspan=2, columnspan=4, sticky="NESW", padx=5, pady=5)
 
 
@@ -161,12 +165,18 @@ def load_ui():
     window.geometry("600x300")
     tk.Grid.rowconfigure(window, tuple(range(4)), weight=1)
     tk.Grid.columnconfigure(window, tuple(range(5)),weight=1)
-    button1 = tk_.Button(window, command=toggle_playback, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black", focuscolor="black", borderless=1)
+    button1 = tk_.Button(window, command=toggle_playback, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     button1.configure(text="Pause" if state["is_playing"] else "Play", anchor="center")
-    button2 = tk_.Button(window, text="Back", command=back, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black", focuscolor="black", borderless=1)
-    button3 = tk_.Button(window, text="Skip", command=skip, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black", focuscolor="black", borderless=1)
-    button4 = tk_.Button(window, text="Set volume", command=set_vol, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black", focuscolor="black", borderless=1)
-    button5 = tk_.Button(window, text="Set Position", command=lambda: seek(pos.get()*1000), fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black", focuscolor="black", borderless=1)
+    button2 = tk_.Button(window, text="Back", command=back, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
+    button3 = tk_.Button(window, text="Skip", command=skip, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
+    button4 = tk_.Button(window, text="Set volume", command=set_vol, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
+    button5 = tk_.Button(window, text="Set Position", command=lambda: seek(pos.get()*1000), fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
+    if mac:
+        button1.configure(focuscolor="black", borderless=1)
+        button2.configure(focuscolor="black", borderless=1)
+        button3.configure(focuscolor="black", borderless=1)
+        button4.configure(focuscolor="black", borderless=1)
+        button5.configure(focuscolor="black", borderless=1)
     scale1 = tk.Scale(window, variable=vol, from_=100, to=0, bg="black", fg="LightGreen", label="Volume")
     scale2 = tk.Scale(window, variable=pos, from_=0, to=state["item"]["duration_ms"]/1000, bg="black", fg="LightGreen", orient="horizontal", label="Position")
     button1.grid(row=0, column=1, rowspan=2, columnspan=4, sticky="NESW", padx=5, pady=5)
