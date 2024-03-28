@@ -1,9 +1,12 @@
 import requests as r
 import tkinter as tk
+from tkinter import font
 import platform
 import threading
 import get_token
 from math import floor
+from PIL import Image, ImageTk
+from io import BytesIO
 
 limit = get_token.config["device_not_found_limit"]
 if limit is not False:
@@ -48,7 +51,6 @@ def get_state(quiet=False):
             "is_playing": False,
             "progress_ms": 0
         }
-    
 
 def set_vol():
     url = f"https://api.spotify.com/v1/me/player/volume?volume_percent={vol.get()}"
@@ -139,6 +141,8 @@ def back():
 
 def update_buttons():
     global button1
+    global label1
+    global label3
     get_state(True)
     scale2.configure(to=state["item"]["duration_ms"]/1000)
     vol.set(state["device"]["volume_percent"])
@@ -148,7 +152,13 @@ def update_buttons():
     if mac:
         button1.configure(focuscolor="black", borderless=1)
     button1.grid(row=0, column=1, rowspan=2, columnspan=4, sticky="NESW", padx=5, pady=5)
-
+    response = r.get(state["item"]["album"]["images"][0]["url"])
+    img = Image.open(BytesIO(response.content))
+    img = img.resize((150, 150), Image.Resampling.LANCZOS)
+    tkimg = ImageTk.PhotoImage(img)
+    label1.configure(image=tkimg)
+    label1.image = tkimg
+    label3.configure(text=f"{state["item"]["name"]} by {state["item"]["artists"][0]["name"]}")
 
 def load_ui():
     global window
@@ -157,20 +167,33 @@ def load_ui():
     global button1
     global scale1
     global scale2
+    global label1
+    global label3
     window = tk.Tk()
+    default_font = font.nametofont('TkTextFont').actual()
     window.configure(background="black")
     vol = tk.IntVar(value=state["device"]["volume_percent"])
     pos = tk.IntVar(value=state["progress_ms"]/1000)
     window.title("Spotify Controller")
-    window.geometry("600x300")
+    window.geometry("600x350")
     tk.Grid.rowconfigure(window, tuple(range(4)), weight=1)
-    tk.Grid.columnconfigure(window, tuple(range(5)),weight=1)
+    tk.Grid.columnconfigure(window, tuple(range(6)),weight=1)
+    response = r.get(state["item"]["album"]["images"][0]["url"])
+    img = Image.open(BytesIO(response.content))
+    img = img.resize((150, 150), Image.Resampling.LANCZOS)
+    tkimg = ImageTk.PhotoImage(img)
     button1 = tk_.Button(window, command=toggle_playback, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     button1.configure(text="Pause" if state["is_playing"] else "Play", anchor="center")
     button2 = tk_.Button(window, text="Back", command=back, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     button3 = tk_.Button(window, text="Skip", command=skip, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     button4 = tk_.Button(window, text="Set volume", command=set_vol, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     button5 = tk_.Button(window, text="Set Position", command=lambda: seek(pos.get()*1000), fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
+    label1 = tk.Label(window, image=tkimg, width=150, height=150, bg="black")
+    label2 = tk.Label(text="Currently playing:", bg="black", fg="white", font=(default_font, 15))
+    label3 = tk.Label(text=f"{state["item"]["name"]} by {state["item"]["artists"][0]["name"]}", bg="black", fg="white", font=(default_font, 12), wraplength=100, justify="center")
+    label1.grid(row=1, column=5, sticky="NESW", padx=5, pady=5)
+    label2.grid(row=0, column=5, sticky="NESW", padx=5, pady=5)
+    label3.grid(row=2, column=5, columnspan=2, sticky="NESW", padx=5, pady=5)
     if mac:
         button1.configure(focuscolor="black", borderless=1)
         button2.configure(focuscolor="black", borderless=1)
