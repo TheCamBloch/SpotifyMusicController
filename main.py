@@ -158,7 +158,7 @@ def update_buttons():
     tkimg = ImageTk.PhotoImage(img)
     label1.configure(image=tkimg)
     label1.image = tkimg
-    label3.configure(text=f"{state["item"]["name"]} by {state["item"]["artists"][0]["name"]}")
+    label3.configure(text=f"{state['item']['name']} by {state['item']['artists'][0]['name']}")
 
 def load_ui():
     global window
@@ -190,7 +190,7 @@ def load_ui():
     button5 = tk_.Button(window, text="Set Position", command=lambda: seek(pos.get()*1000), fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     label1 = tk.Label(window, image=tkimg, width=150, height=150, bg="black")
     label2 = tk.Label(text="Currently playing:", bg="black", fg="white", font=(default_font, 15))
-    label3 = tk.Label(text=f"{state["item"]["name"]} by {state["item"]["artists"][0]["name"]}", bg="black", fg="white", font=(default_font, 12), wraplength=100, justify="center")
+    label3 = tk.Label(text=f"{state['item']['name']} by {state['item']['artists'][0]['name']}", bg="black", fg="white", font=(default_font, 12), wraplength=100, justify="center")
     label1.grid(row=1, column=5, sticky="NESW", padx=5, pady=5)
     label2.grid(row=0, column=5, sticky="NESW", padx=5, pady=5)
     label3.grid(row=2, column=5, columnspan=2, sticky="NESW", padx=5, pady=5)
