@@ -31,6 +31,10 @@ Add client_id and client_secret to `config.json`.
 "client_id": "<YOUR CLIENT ID>",
 "client_secret": "<YOUR CLIENT SECRET>",
 ```
+Execute the program by running `main.py`.
+```bash
+python main.py
+```
 
 ## Authors
 * Cameron Bloch - Cameron.S.Bloch@gmail.com - TheCamBloch
