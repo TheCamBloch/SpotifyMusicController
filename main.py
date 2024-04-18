@@ -7,6 +7,7 @@ import get_token
 from math import floor
 from PIL import Image, ImageTk
 from io import BytesIO
+from os.path import join, dirname
 
 limit = get_token.config["device_not_found_limit"]
 if limit is not False:
@@ -152,8 +153,11 @@ def update_buttons():
     if mac:
         button1.configure(focuscolor="black", borderless=1)
     button1.grid(row=0, column=1, rowspan=2, columnspan=4, sticky="NESW", padx=5, pady=5)
-    response = r.get(state["item"]["album"]["images"][0]["url"])
-    img = Image.open(BytesIO(response.content))
+    try:
+        response = r.get(state["item"]["album"]["images"][0]["url"])
+        img = Image.open(BytesIO(response.content))
+    except KeyError:
+        img = Image.open(join(dirname(__file__), "unknown.png"), "r")
     img = img.resize((150, 150), Image.Resampling.LANCZOS)
     tkimg = ImageTk.PhotoImage(img)
     label1.configure(image=tkimg)
@@ -178,8 +182,11 @@ def load_ui():
     window.geometry("600x350")
     tk.Grid.rowconfigure(window, tuple(range(4)), weight=1)
     tk.Grid.columnconfigure(window, tuple(range(6)),weight=1)
-    response = r.get(state["item"]["album"]["images"][0]["url"])
-    img = Image.open(BytesIO(response.content))
+    try:
+        response = r.get(state["item"]["album"]["images"][0]["url"])
+        img = Image.open(BytesIO(response.content))
+    except KeyError:
+        img = Image.open(join(dirname(__file__), "unknown.png"), "r")
     img = img.resize((150, 150), Image.Resampling.LANCZOS)
     tkimg = ImageTk.PhotoImage(img)
     button1 = tk_.Button(window, command=toggle_playback, fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
@@ -190,7 +197,10 @@ def load_ui():
     button5 = tk_.Button(window, text="Set Position", command=lambda: seek(pos.get()*1000), fg="LightGreen", bg="#18191A", activebackground="LightGreen", activeforeground="black")
     label1 = tk.Label(window, image=tkimg, width=150, height=150, bg="black")
     label2 = tk.Label(text="Currently playing:", bg="black", fg="white", font=(default_font, 15))
-    label3 = tk.Label(text=f"{state['item']['name']} by {state['item']['artists'][0]['name']}", bg="black", fg="white", font=(default_font, 12), wraplength=100, justify="center")
+    try:
+        label3 = tk.Label(text=f"{state['item']['name']} by {state['item']['artists'][0]['name']}", bg="black", fg="white", font=(default_font, 12), wraplength=100, justify="center")
+    except KeyError:
+        label3 = tk.Label(text="Unknown", bg="black", fg="white", font=(default_font, 12), wraplength=100, justify="center")
     label1.grid(row=1, column=5, sticky="NESW", padx=5, pady=5)
     label2.grid(row=0, column=5, sticky="NESW", padx=5, pady=5)
     label3.grid(row=2, column=5, columnspan=2, sticky="NESW", padx=5, pady=5)
